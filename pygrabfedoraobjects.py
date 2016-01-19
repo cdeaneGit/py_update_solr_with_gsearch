@@ -2,8 +2,6 @@ __author__ = 'mbagget1'
 
 import argparse
 from lxml import etree
-import time
-
 
 parser = argparse.ArgumentParser(description='Use to specify a collection')
 parser.add_argument("-c", "--collection", dest="collection", help="namespace of collection", required=True)
@@ -19,20 +17,12 @@ def createfile(filename):
 
 def processresults(fullSearchString, f, token):
     token = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}token')
-    print(len(token))
-    print(token[0].text)
-    print(fullSearchString)
     results = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
     tokenval = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}token')[0].text
-    cursor = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}cursor')[0].text
     for item in results:
         f.write(item.text)
     if len(token) == 1:
         newSearchString = fullSearchString + "&sessionToken=" + tokenval
-        print(newSearchString)
-        print(len(token))
-        print(tokenval)
-        print(cursor)
         processresults(newSearchString, f, token)
     else:
         f.close()
