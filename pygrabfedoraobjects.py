@@ -2,22 +2,42 @@ __author__ = 'mbagget1'
 
 import argparse
 from lxml import etree
+import time
 
+
+parser = argparse.ArgumentParser(description='Use to specify a collection')
+parser.add_argument("-c", "--collection", dest="collection", help="namespace of collection", required=True)
+parser.add_argument("-l", "--link", dest="fedoraurl", help="url of fedora instance")
+parser.add_argument("-p", "--port", dest="portnumber", help="port number of fedora instance")
+parser.add_argument("-f", "--filename", dest="destfilename", help="name of file you want to save your set to")
+args = parser.parse_args()
 
 def createfile(filename):
     f = open(filename, 'w')
+    token = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}token')
+    processresults(fullSearchString, f, token)
+
+def processresults(fullSearchString, f, token):
+    token = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}token')
+    print(len(token))
+    print(token[0].text)
+    print(fullSearchString)
     results = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
+    tokenval = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}token')[0].text
+    cursor = etree.parse(fullSearchString).findall('//{http://www.fedora.info/definitions/1/0/types/}cursor')[0].text
     for item in results:
         f.write(item.text)
-    f.close()
+    if len(token) == 1:
+        newSearchString = fullSearchString + "&sessionToken=" + tokenval
+        print(newSearchString)
+        print(len(token))
+        print(tokenval)
+        print(cursor)
+        processresults(newSearchString, f, token)
+    else:
+        f.close()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Use to specify a collection')
-    parser.add_argument("-c", "--collection", dest="collection", help="namespace of collection", required=True)
-    parser.add_argument("-l", "--link", dest="fedoraurl", help="url of fedora instance")
-    parser.add_argument("-p", "--port", dest="portnumber", help="port number of fedora instance")
-    parser.add_argument("-f", "--filename", dest="destfilename", help="name of file you want to save your set to")
-    args = parser.parse_args()
 
     # Defaults
     fedoraurl = 'http://digital.lib.utk.edu'
