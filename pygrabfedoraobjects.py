@@ -10,12 +10,14 @@ parser.add_argument("-l", "--link", dest="fedoraurl", help="url of fedora instan
 parser.add_argument("-f", "--filename", dest="destfilename", help="name of file you want to save your set to")
 args = parser.parse_args()
 
+
 def createfile(filename):
     f = open(filename, 'w')
     document = etree.parse(fullSearchString)
-    sessiontoken =""
+    sessiontoken = ""
     recordcount = 0
     processresults(document, fullSearchString, f, sessiontoken, recordcount)
+
 
 def processresults(document, fullSearchString, f, sessiontoken, recordcount):
     document = etree.parse(fullSearchString + sessiontoken)
@@ -37,7 +39,7 @@ def processresults(document, fullSearchString, f, sessiontoken, recordcount):
             gsearchpass = input("Enter gsearch password:  ")
             gsearchhost = input("Enter host name:  ")
             newsh = open("gsearchupdater.sh", 'w')
-            newsh.write('FH=$FEDORA_HOME \nUSERNAME="' + gsearchuser +'"\nPASSWORD="' + gsearchpass + '"\nHOST="' + gsearchhost + '"\nPORT="8080"\nPROT="http"\nPIDS="gsearchupdater.sh"\n\n' + 'cat $PIDS | while read line; do\n   curl -XPOST -u"$USERNAME:$PASSWORD" "$PROT://$HOST:$PORT/fedoragsearch/rest?operation=updateIndex&action=fromPid&value=$line"\ndone')
+            newsh.write('FH=$FEDORA_HOME \nUSERNAME="' + gsearchuser + '"\nPASSWORD="' + gsearchpass + '"\nHOST="' + gsearchhost + '"\nPORT="8080"\nPROT="http"\nPIDS="gsearchupdater.sh"\n\n' + 'cat $PIDS | while read line; do\n   curl -XPOST -u"$USERNAME:$PASSWORD" "$PROT://$HOST:$PORT/fedoragsearch/rest?operation=updateIndex&action=fromPid&value=$line"\ndone')
             print('File was created.')
             newsh.close()
             subprocess.call('./gsearchupdater.sh', shell=True)

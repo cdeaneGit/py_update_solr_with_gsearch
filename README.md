@@ -13,5 +13,5 @@ python -l localhost -p gamble
 #### To Do
 
 * As of now, this only works versus the parent namespace.
-    * Add query option to work against Dublincore Collection for instances when a collection has more than one parent namespace.
+    * Add query option to work against Dublin Core collection for instances when a collection has more than one parent namespace.
 
