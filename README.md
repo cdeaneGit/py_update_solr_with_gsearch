@@ -4,14 +4,26 @@
 
 #### About
 
-This script finds objects that from a Fedora 3 repository and writes their associated PIDS to a text file so that the Solr index can be updated via gsearch.
+This script queries a Fedora 3 repository and writes the PIDS of the returned objects to a text file. The text file can then be used to update Solr via Fedora gsearch.
 
-#### Example
+#### Options and Examples
 
-python -l localhost -p gamble
+**Options**
+
+* -l (Specify url of Fedora instance)
+* -p (Specify parent namespace of collection)
+* -dcr (Specify Dublin Core Relation value - Encode spaces as %20)
+* -f (Specify filename to save PIDs)
+
+**Query against parent namespace**
+
+python -l localhost -p gamble -f recordset.txt
+
+**Query against dc relation**
+
+python -l localhost -dcr Bogart%20Family
 
 #### To Do
 
-* As of now, this only works versus the parent namespace.
-    * Add query option to work against Dublin Core collection for instances when a collection has more than one parent namespace.
+* Add option to call authentication information of gsearch from environmental variables.
 
