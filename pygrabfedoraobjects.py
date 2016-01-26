@@ -1,26 +1,24 @@
-__author__ = 'mbagget1'
-
 import argparse
 from lxml import etree
 import subprocess
 
 parser = argparse.ArgumentParser(description='Use to specify a collection')
-parser.add_argument("-p", "--parentnamespace", dest="parentnamespace", help="parent namespace of collection", required=True)
+parser.add_argument("-p", "--parentnamespace", dest="parentnamespace", help="parent namespace of collection")
 parser.add_argument("-l", "--link", dest="fedoraurl", help="url of fedora instance")
 parser.add_argument("-f", "--filename", dest="destfilename", help="name of file you want to save your set to")
+parser.add_argument("-dcr", "--dcrelation", dest="dcrelation", help="grab pids according to dc relation")
 args = parser.parse_args()
 
 
-def createfile(filename):
-    f = open(filename, 'w')
-    document = etree.parse(fullSearchString)
+def createfile(x):
+    f = open(x, 'w')
     sessiontoken = ""
     recordcount = 0
-    processresults(document, fullSearchString, f, sessiontoken, recordcount)
+    processresults(fullSearchString, f, sessiontoken, recordcount)
 
 
-def processresults(document, fullSearchString, f, sessiontoken, recordcount):
-    document = etree.parse(fullSearchString + sessiontoken)
+def processresults(url, f, sessiontoken, recordcount):
+    document = etree.parse(url + sessiontoken)
     token = document.findall('//{http://www.fedora.info/definitions/1/0/types/}token')
     results = document.findall('//{http://www.fedora.info/definitions/1/0/types/}pid')
     recordcount += len(results)
@@ -29,7 +27,7 @@ def processresults(document, fullSearchString, f, sessiontoken, recordcount):
     if len(token) == 1:
         tokenval = document.findall('//{http://www.fedora.info/definitions/1/0/types/}token')[0].text
         sessiontoken = "&sessionToken=" + tokenval
-        processresults(document, fullSearchString, f, sessiontoken, recordcount)
+        processresults(url, f, sessiontoken, recordcount)
     else:
         print("Done Processing. Wrote " + str(recordcount) + " records.")
         f.close()
@@ -54,15 +52,18 @@ if __name__ == "__main__":
     fedoraurl = 'http://digital.lib.utk.edu'
     fedcollection = ''
     filename = "recordset.txt"
+    dcrelation = ''
 
     if args.fedoraurl:
         fedoraurl = "http://{0}".format(args.fedoraurl)
     if args.parentnamespace:
-        fedcollection = "{0}*".format(args.parentnamespace)
+        fedcollection = "pid%7E{0}*".format(args.parentnamespace)
     if args.destfilename:
         filenamedest = "{0}.txt".format(args.destfilename)
+    if args.dcrelation:
+        dcrelation = "relation%7E%27{0}%27".format(args.dcrelation).replace(" ", "%20")
 
-    fullSearchString = fedoraurl + ":8080/fedora/objects?query=pid%7E" + fedcollection + "&pid=true&resultFormat=xml"
+    fullSearchString = fedoraurl + ":8080/fedora/objects?query=" + fedcollection + dcrelation + "&pid=true&resultFormat=xml"
 
     createfile(filename)
 
