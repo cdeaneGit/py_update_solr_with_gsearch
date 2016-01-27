@@ -1,6 +1,7 @@
 import argparse
 from lxml import etree
 import subprocess
+import os
 
 parser = argparse.ArgumentParser(description='Use to specify a collection')
 parser.add_argument("-p", "--parentnamespace", dest="parentnamespace", help="parent namespace of collection")
@@ -33,17 +34,29 @@ def processresults(url, f, sessiontoken, recordcount):
         f.close()
         question = input("Update Solr from Results [y/N]")
         if question == "y":
-            gsearchuser = input("Enter gsearch username:  ")
-            gsearchpass = input("Enter gsearch password:  ")
-            gsearchhost = input("Enter host name:  ")
-            newsh = open("gsearchupdater.sh", 'w')
-            newsh.write('FH=$FEDORA_HOME \nUSERNAME="' + gsearchuser + '"\nPASSWORD="' + gsearchpass + '"\nHOST="' + gsearchhost + '"\nPORT="8080"\nPROT="http"\nPIDS="gsearchupdater.sh"\n\n' + 'cat $PIDS | while read line; do\n   curl -XPOST -u"$USERNAME:$PASSWORD" "$PROT://$HOST:$PORT/fedoragsearch/rest?operation=updateIndex&action=fromPid&value=$line"\ndone')
-            print('File was created.')
-            newsh.close()
-            subprocess.call('./gsearchupdater.sh', shell=True)
-            print('\n\nProcess complete.')
+            loadenvar = input("Would you like to load your gsearch authentication information from environmental variables [y/N]")
+            if loadenvar == "y":
+                gsearchuser = os.environ.get('GSEARCH_USER')
+                gsearchpass = os.environ.get('GSEARCH_PASS')
+                gsearchhost = os.environ.get('GSEARCH_HOST')
+                print(gsearchuser)
+            else:
+                gsearchuser = input("Enter gsearch username:  ")
+                gsearchpass = input("Enter gsearch password:  ")
+                gsearchhost = input("Enter host name:  ")
+            print(gsearchuser)
+            launchshell(gsearchuser, gsearchpass, gsearchhost)
         else:
             print("Exiting.")
+
+
+def launchshell(user, passwd, host):
+    newsh = open("gsearchupdater.sh", 'w')
+    newsh.write('FH=$FEDORA_HOME \nUSERNAME="' + user + '"\nPASSWORD="' + passwd + '"\nHOST="' + host + '"\nPORT="8080"\nPROT="http"\nPIDS="gsearchupdater.sh"\n\n' + 'cat $PIDS | while read line; do\n   curl -XPOST -u"$USERNAME:$PASSWORD" "$PROT://$HOST:$PORT/fedoragsearch/rest?operation=updateIndex&action=fromPid&value=$line"\ndone')
+    print('File was created.')
+    newsh.close()
+    subprocess.call('./gsearchupdater.sh', shell=True)
+    print('\n\nProcess complete.')
 
 
 if __name__ == "__main__":
