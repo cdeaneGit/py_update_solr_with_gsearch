@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 
 def createfile(x):
-    f = open(x, 'w')
+    f = open("records/" + x, 'w')
     sessiontoken = ""
     recordcount = 0
     processresults(fullSearchString, f, sessiontoken, recordcount)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     if args.parentnamespace:
         fedcollection = "pid%7E{0}*".format(args.parentnamespace)
     if args.destfilename:
-        filenamedest = "{0}.txt".format(args.destfilename)
+        filename = "{0}.txt".format(args.destfilename)
     if args.dcrelation:
         dcrelation = "relation%7E%27{0}%27".format(args.dcrelation).replace(" ", "%20")
 
